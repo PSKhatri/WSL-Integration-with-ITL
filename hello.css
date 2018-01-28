@@ -1,0 +1,39 @@
+
+
+.navbar-nav > button{
+  padding-left:30px;
+  padding-right:30px;
+}
+
+
+#collection input[type="checkbox"] + label{
+display:block;
+margin:0.2em;
+cursor:pointer;
+padding:0.2em;
+
+}
+
+#collection input[type="checkbox"]{
+display:none;
+}
+
+#collection input[type="checkbox"] +label:before{
+content:"\2714";
+border:0.1em solid #000;
+border-radius:0.2em;
+display:inline-block;
+width:1em;
+height:1em;
+padding-left:0.2em;
+padding-bottom:0.3em;
+margin-right:0.2em;
+vertical-align:bottom;
+color:transparent;
+}
+
+#collection input[type="checkbox"]:checked + label:before{
+background-color:Blue;
+border-color:Blue;
+color:#fff;
+}
