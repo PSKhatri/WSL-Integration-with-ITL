@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="en">
   <head>
+    
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -10,7 +11,7 @@
     <link href="../static/hello.css" rel="stylesheet">
     <title>Sandesh 2.0</title>
   </head>
-  <body>
+  <body >
     <div class="container">
     <div  align= "left" style="font-size:47px"><strong>Sandesh</strong></div>
     <p class="lead" align="left"style="font-size:14px;margin-top:-6px" >A Semantic Data Mesh Over Indian Open Data ( powered by Linked Open Data )</p>
@@ -27,15 +28,16 @@
      <nav class="navbar navbar-inverse">
   <div class="container">
     <ul class="nav navbar-nav">
-       <input type="file"  id="input1" style="display: none" accept=".csv" multiple />
-        <button class="btn btn-default navbar-btn btn-margin-left" >Import Files</button>
+      <button id="importFiles" class="btn btn-default navbar-btn btn-margin-left" >Import Files</button>
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<script>
+		$(document).ready(function(){
+    	$("#importFiles").click(function(){
+        document.getElementById('IMPORTFILES').style.display = 'block';
+    		});
+		});
+	</script>
 
-        <script src="https://code.jquery.com/jquery-2.2.4.js"></script>
-        <script>
-            $("button").on("click", function() {
-                $('#input1').trigger("click");
-            });
-        </script>
       <button class="btn btn-default navbar-btn btn-margin-left">View</button>
       <button class="btn btn-default navbar-btn btn-margin-left">Semantic Footprint</button>
       <button class="btn btn-default navbar-btn btn-margin-left">Run Model</button>
@@ -44,11 +46,25 @@
     </ul>
   </div>
 </nav>
+
+<div id="IMPORTFILES" style="display: none">
+	<form  onsubmit="show_alert();" action="" method = "POST" 
+         enctype = "multipart/form-data">
+         <input type = "file" name = "file[]" accept=".csv" multiple/>
+         <input type = "submit" id="upload-file-btn" />
+    </form>
+<script>
+function show_alert() {
+   alert("Files successfully uploaded");
+}
+</script>   
+</div>    
 </div>
 </div>
+
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 
