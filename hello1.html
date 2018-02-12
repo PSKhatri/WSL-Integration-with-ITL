@@ -13,32 +13,98 @@
   </head>
   <body >
     <div class="container">
-    <div  align= "left" style="font-size:47px"><strong>Sandesh</strong></div>
+    <div align= "left" style="font-size:47px"><strong>Sandesh</strong></div>
     <p class="lead" align="left"style="font-size:14px;margin-top:-6px" >A Semantic Data Mesh Over Indian Open Data ( powered by Linked Open Data )</p>
     </div>
     <hr style="margin-top:-7px; height:2px;border:none;color:#333;background-color:#333;">
     <div class="row">
     <div class="col-sm-3">
-    <div class="container" id="container2">
-    <input type="checkbox" id="collection" name="check1" value="Collection">
-    <label for="collection">Collection</label>
+    
+    <div class="container" id="checkboxGroup" >
+    <input type="checkbox" id="chkHeader" name="chkHeader" onclick="checkUncheckAll(this);">Collection<br/><br/>
+           <ul>
+           {% for item in filenames %}
+           <input type="checkbox" name="chkItems" onclick="checkUnCheckParent();" />{{ item }}<br/><br/>
+           {% endfor %}
+        </ul>
+    
     </div>
+
+    <div class="container" id="radioGroup" style="display:none">
+    <h5>Collection</h5>
+           <ul>
+           {% for item in filenames %}
+           <input type="radio" name="chkItems" value="{{ item }}"/>{{ item }}<br/><br/>
+           {% endfor %}
+           </ul>
+           </div>
+           
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+ 
+    <script type="text/javascript">
+        function checkUncheckAll(sender) {
+            var chkElements = document.getElementsByName('chkItems');
+            for (var i = 0; i < chkElements.length; i++) {
+                chkElements[i].checked = sender.checked;
+            }
+        }
+        function checkUnCheckParent() {
+            var chkHeader = document.getElementById('chkHeader');
+            var chkElements = document.getElementsByName('chkItems');
+            var checkedCount = 0;
+            for (var i = 0; i < chkElements.length; i++) {
+                if (chkElements[i].checked) {
+                    checkedCount += 1;
+                }
+            }
+            chkHeader.checked = (checkedCount === chkElements.length);
+        }
+    </script>
+
     </div>
+
+    <script type="text/javascript">
+           $(document).ready(function(){
+           $('input[type="radio"]').click(function(){
+           var inputValue = $(this).attr("value");
+           document.getElementById('selectFromCollection').style.display='none';
+           document.getElementById('VIEW').style.display = 'block';
+           $('#fileContent').text(inputValue);
+      });
+   });
+</script>
     <div class="col-sm-9">
      <nav class="navbar navbar-inverse">
   <div class="container">
     <ul class="nav navbar-nav">
       <button id="importFiles" class="btn btn-default navbar-btn btn-margin-left" >Import Files</button>
       <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-	<script>
-		$(document).ready(function(){
-    	$("#importFiles").click(function(){
+      <script>
+      $(document).ready(function(){
+      $("#importFiles").click(function(){
         document.getElementById('IMPORTFILES').style.display = 'block';
-    		});
-		});
-	</script>
+        document.getElementById('VIEW').style.display = 'none';
+        document.getElementById('selectFromCollection').style.display='none';
+        document.getElementById('radioGroup').style.display = 'none';
+        });
+      });
+      </script>
 
-      <button class="btn btn-default navbar-btn btn-margin-left">View</button>
+      <button id="View" class="btn btn-default navbar-btn btn-margin-left" onclick="checkboxes()">View</button>
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+      <script>
+      $(document).ready(function(){
+      $("#View").click(function(){
+
+        document.getElementById('IMPORTFILES').style.display = 'none';
+        document.getElementById('checkboxGroup').style.display="none"
+        document.getElementById('radioGroup').style.display = 'block';
+        document.getElementById('selectFromCollection').style.display='block';
+         });
+      });
+    </script>
+
       <button class="btn btn-default navbar-btn btn-margin-left">Semantic Footprint</button>
       <button class="btn btn-default navbar-btn btn-margin-left">Run Model</button>
       <button class="btn btn-default navbar-btn btn-margin-left">Upload N-Quad</button>
@@ -48,18 +114,43 @@
 </nav>
 
 <div id="IMPORTFILES" style="display: none">
-	<form  onsubmit="show_alert();" action="" method = "POST" 
+  <form  id ="formforip" action="/uploaded"  method = "POST" 
          enctype = "multipart/form-data">
-         <input type = "file" name = "file[]" accept=".csv" multiple/>
-         <input type = "submit" id="upload-file-btn" />
+         <input type = "file" name = "file[]" id="inputfiles" accept=".csv" multiple/>
+         <input type = "submit" id="uploadFileBtn" onclick="myFunction()"/>
     </form>
 <script>
-function show_alert() {
-   alert("Files successfully uploaded");
-}
-</script>   
-</div>    
+$(document).ready(function(){
+  $("#formforip").submit(function(){
+    if(document.getElementById("inputfiles").files.length == 0 ){
+      alert("empty");
+      
+    }
+    else{
+      alert("uploaded!!");
+    }
+  });
+});
+</script>
 </div>
+
+<div id="selectFromCollection" style="display: none">
+  <p>Select a file from Collection....</p>
+</div>  
+
+
+<div id="VIEW" style="display:none">
+   <form>
+      Domain: &nbsp &nbsp &nbsp &nbsp<textarea cols="50" rows="1" name="domain"></textarea>/<br/><br/>
+      Source: &nbsp &nbsp &nbsp &nbsp &nbsp<textarea cols="50" rows="1" name="source"></textarea><br/><br/>
+      Description:&nbsp &nbsp<textarea cols="50" rows="3" name="description"></textarea><br/><br/>
+      <textarea style="height:250px;width:700px;border:1px solid #ccc;font:16px/26px Georgia, Garamond, Serif;overflow:auto;" id="fileContent"></textarea>
+      <br/>
+      <input type="submit" value="SAVE">
+   </form>
+</div>
+
+
 </div>
 
     <!-- Optional JavaScript -->
@@ -72,4 +163,3 @@ function show_alert() {
 
   </body>
 </html>
-
