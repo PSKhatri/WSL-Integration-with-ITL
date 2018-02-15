@@ -1,4 +1,6 @@
 import os
+from flask.json import dumps
+from flask.json import JSONEncoder
 from flask import Flask, request, redirect, url_for,render_template,jsonify,json
 from werkzeug import secure_filename
 from flask_jsglue import JSGlue
@@ -44,11 +46,44 @@ def readcsv():
         resultset = {}
         with open(fname, 'r+') as f:
           reader = csv.reader(f)
-          i = 0;
+          i = 0
           for row in reader:
             resultset[i] = row
             i= i+1
-
-    
         print resultset
         return json.dumps(resultset)
+
+
+@app.route('/save', methods=['POST'])
+def save():
+    # read the posted values from the UI
+    print("save me aya re")
+    name = request.form['name']
+    print (name)
+    domain = request.form['domain']
+    #print (domain)
+    source = request.form['source']
+    description = request.form['description']
+    
+    line=[name,domain,source,description]
+    print(line)
+    with open('inputFiles/input_files.csv') as inf, open('inputFiles/tmp_i.csv', 'w') as outf :
+    	reader = csv.reader(inf) 
+    	writer = csv.writer(outf)
+      	flag=0
+      	for row in reader:
+	   		print(row)
+	   		if(row[0]==name):
+	   			flag=1
+	   			writer.writerow(line)
+	   		else:
+	   			writer.writerow(row)
+    	if(flag==0):
+    		writer.writerow(line)
+
+
+	f=open('inputFiles/input_files.csv')
+	print(f.read())
+	os.remove('inputFiles/input_files.csv')
+
+	os.rename('inputFiles/tmp_i.csv','inputFiles/input_files.csv')

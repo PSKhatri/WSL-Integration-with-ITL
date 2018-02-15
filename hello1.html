@@ -80,6 +80,7 @@
            $(document).ready(function(){
            $('input[type="radio"]').click(function(){
            var inputValue = $(this).attr("value");
+           document.getElementById('name').innerHTML=inputValue;
            document.getElementById('selectFromCollection').style.display='none';
            document.getElementById('VIEW').style.display = 'block';
            document.getElementById('table_csv').style.display='block';
@@ -90,8 +91,9 @@
                   success : function(data,textStatus,jQXHR){
                document.getElementById("table_csv").innerHTML="";
                var records = JSON.parse(data);
+               console.log(records);
                           console.log(typeof records);
-  if(!(records.isEmpty)){
+   if(!(records.isEmpty)){
         var table = document.createElement('table');
         table.className="table table-striped table-bordered";
         table.setAttribute("id", "themedata");
@@ -144,6 +146,40 @@
    });
 });
 </script>
+
+
+
+
+    <script type="text/javascript">
+           $(document).ready(function(){
+           $('#savethecsv').click(function(){
+           document.getElementById('selectFromCollection').style.display='none';
+           document.getElementById('VIEW').style.display = 'none';
+           document.getElementById('table_csv').style.display='block';
+                  $.ajax({
+            url: '/save',
+            data: $('form').serialize(),
+            type: 'POST',
+            success: function(response) {
+                console.log(response);
+            },
+            error: function(error) {
+                console.log(error);
+            }
+        });
+   });
+});
+</script>
+
+
+
+
+
+
+
+
+
+
     <div class="col-sm-9">
      <nav class="navbar navbar-inverse">
   <div class="container">
@@ -215,13 +251,14 @@ $(document).ready(function(){
 
 <div id="VIEW" style="display:none">
    <form>
-      Domain: &nbsp &nbsp &nbsp &nbsp<textarea cols="50" rows="1" name="domain"></textarea></br/><br/>
-      Source: &nbsp &nbsp &nbsp &nbsp &nbsp<textarea cols="50" rows="1" name="source"></textarea><br/><br/>
-      Description:&nbsp &nbsp<textarea cols="50" rows="3" name="description"></textarea><br/><br/>
+      Name: &nbsp &nbsp &nbsp &nbsp &nbsp <textarea cols="50" rows="1" name="name" id="name"></textarea></br></br>
+      Domain: &nbsp &nbsp &nbsp &nbsp<textarea cols="50" rows="1" name="domain" id="domain"></textarea></br/><br/>
+      Source: &nbsp &nbsp &nbsp &nbsp &nbsp<textarea cols="50" rows="1" name="source" id="source"></textarea><br/><br/>
+      Description:&nbsp &nbsp<textarea cols="50" rows="3" name="description" id="description"></textarea><br/><br/>
       <br/>
+      <div class='header_names' id='table_csv' style="display: none">table</div>
       <input type="submit" id="savethecsv" value="SAVE">
    </form>
-   <div class='header_names' id='table_csv' style="display: none">table</div>
 </div>
 
 
