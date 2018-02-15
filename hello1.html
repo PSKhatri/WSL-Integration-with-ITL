@@ -2,6 +2,9 @@
 <html lang="en">
   <head>
     
+    <script type=text/javascript>
+  $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+  </script>
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -9,6 +12,16 @@
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <link href="../static/hello.css" rel="stylesheet">
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mootools/1.6.0/mootools-core.min.js"></script>
+        
+    </head>
+
+
+
+
     <title>Sandesh 2.0</title>
   </head>
   <body >
@@ -34,13 +47,12 @@
     <h5>Collection</h5>
            <ul>
            {% for item in filenames %}
-           <input type="radio" name="chkItems" value="{{ item }}"/>{{ item }}<br/><br/>
+           <input type="radio" name="chkradio" value="{{ item }}"/>{{ item }}<br/><br/>
            {% endfor %}
            </ul>
            </div>
            
 
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
  
     <script type="text/javascript">
         function checkUncheckAll(sender) {
@@ -61,7 +73,7 @@
             chkHeader.checked = (checkedCount === chkElements.length);
         }
     </script>
-
+  
     </div>
 
     <script type="text/javascript">
@@ -70,16 +82,73 @@
            var inputValue = $(this).attr("value");
            document.getElementById('selectFromCollection').style.display='none';
            document.getElementById('VIEW').style.display = 'block';
-           $('#fileContent').text(inputValue);
-      });
+           document.getElementById('table_csv').style.display='block';
+                  $.ajax({
+                  url : '/readcsv',
+                  data : 'inputFiles/'+inputValue,
+                  type : 'POST',
+                  success : function(data,textStatus,jQXHR){
+               document.getElementById("table_csv").innerHTML="";
+               var records = JSON.parse(data);
+                          console.log(typeof records);
+  if(!(records.isEmpty)){
+        var table = document.createElement('table');
+        table.className="table table-striped table-bordered";
+        table.setAttribute("id", "themedata");
+        table.setAttribute("cellspacing", "0");
+        table.setAttribute("width", "100%");
+
+        var thead= document.createElement('thead');
+
+        var tr = document.createElement('tr');
+        tr.setAttribute("id","header_id");
+        tr.setAttribute("font-size","2");
+
+        for(var i=0;i<records[0].length;i++) {
+      var th1 = document.createElement('th');
+      th1.setAttribute("id",records[0][i]);
+      th1.setAttribute("class","headers");
+
+      var textvalue = document.createTextNode(records[0][i]);
+
+
+      th1.appendChild(textvalue);
+      tr.appendChild(th1);
+        }
+        thead.appendChild(tr);
+    table.appendChild(thead);
+
+        var tbody= document.createElement('tbody');
+        for(key in records) {
+          if(key != "0") {
+            var tr2=document.createElement('tr');
+            for(var j=0;j<records[key].length;j++) 
+      {
+              var td=document.createElement('td');
+              var textvalue = document.createTextNode(records[key][j]);
+              td.appendChild(textvalue);
+              tr2.appendChild(td);
+            }
+            tbody.appendChild(tr2);
+          }
+        }
+        table.appendChild(tbody);
+  document.getElementById("table_csv").appendChild(table);}
+                  },
+                  error : function(jQXHR,textStatus,errorThrown){
+                    console.log("error : "+ textStatus);
+                  }
+           });
+
+
    });
+});
 </script>
     <div class="col-sm-9">
      <nav class="navbar navbar-inverse">
   <div class="container">
     <ul class="nav navbar-nav">
       <button id="importFiles" class="btn btn-default navbar-btn btn-margin-left" >Import Files</button>
-      <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
       <script>
       $(document).ready(function(){
       $("#importFiles").click(function(){
@@ -91,8 +160,8 @@
       });
       </script>
 
-      <button id="View" class="btn btn-default navbar-btn btn-margin-left" onclick="checkboxes()">View</button>
-      <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+      <button id="View" class="btn btn-default navbar-btn btn-margin-left"">View</button>
+
       <script>
       $(document).ready(function(){
       $("#View").click(function(){
@@ -132,6 +201,11 @@ $(document).ready(function(){
   });
 });
 </script>
+
+<script type="text/javascript">
+  
+
+</script>
 </div>
 
 <div id="selectFromCollection" style="display: none">
@@ -141,13 +215,13 @@ $(document).ready(function(){
 
 <div id="VIEW" style="display:none">
    <form>
-      Domain: &nbsp &nbsp &nbsp &nbsp<textarea cols="50" rows="1" name="domain"></textarea>/<br/><br/>
+      Domain: &nbsp &nbsp &nbsp &nbsp<textarea cols="50" rows="1" name="domain"></textarea></br/><br/>
       Source: &nbsp &nbsp &nbsp &nbsp &nbsp<textarea cols="50" rows="1" name="source"></textarea><br/><br/>
       Description:&nbsp &nbsp<textarea cols="50" rows="3" name="description"></textarea><br/><br/>
-      <textarea style="height:250px;width:700px;border:1px solid #ccc;font:16px/26px Georgia, Garamond, Serif;overflow:auto;" id="fileContent"></textarea>
       <br/>
-      <input type="submit" value="SAVE">
+      <input type="submit" id="savethecsv" value="SAVE">
    </form>
+   <div class='header_names' id='table_csv' style="display: none">table</div>
 </div>
 
 
@@ -155,7 +229,6 @@ $(document).ready(function(){
 
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-    <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 
