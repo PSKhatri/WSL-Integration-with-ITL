@@ -40,7 +40,7 @@ def readcsv():
       if request.method == 'POST':
         
         fname=request.get_data()
-       # infiles=open('/inputFiles/input_files.csv')
+        #infiles=open('/inputFiles/input_files.csv')
         resultset = {}
         with open(fname, 'r+') as f:
           reader = csv.reader(f)
