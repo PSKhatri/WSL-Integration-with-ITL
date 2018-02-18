@@ -56,8 +56,6 @@ def readcsv():
 
 @app.route('/save', methods=['POST'])
 def save():
-    # read the posted values from the UI
-    print("save me aya re")
     name = request.form['name']
     print (name)
     domain = request.form['domain']
@@ -81,9 +79,28 @@ def save():
     	if(flag==0):
     		writer.writerow(line)
 
-
-	f=open('inputFiles/input_files.csv')
-	print(f.read())
+	#f=open('inputFiles/input_files.csv')
+	#print(f.read())
 	os.remove('inputFiles/input_files.csv')
 
 	os.rename('inputFiles/tmp_i.csv','inputFiles/input_files.csv')
+	return json.dumps(line)
+
+@app.route('/retrieve', methods=['POST'])
+def retrieve():
+	fname=request.get_data()
+	resultset1 = {}
+	flag=0
+	with open('inputFiles/input_files.csv', 'r+') as f:
+		reader = csv.reader(f)
+		for row in reader:
+			if row[0]==fname:
+				resultset1[0] = row
+				flag=1
+				break
+		if flag==0:
+			resultset1[0]=[fname,'','','']
+		 		
+	print resultset1
+	return json.dumps(resultset1)
+	

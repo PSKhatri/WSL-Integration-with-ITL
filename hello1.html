@@ -13,10 +13,67 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <link href="../static/hello.css" rel="stylesheet">
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/mootools/1.6.0/mootools-core.min.js"></script>
-        
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+    <style>
+
+.navbar-nav > button{
+  padding-left:30px;
+  padding-right:30px;
+}
+
+
+    input[type=checkbox] { 
+  cursor: pointer;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  outline: 0
+}
+input[type=checkbox]:after {
+  padding-right: 3px;
+  top: 1px;
+  font-family: 'Arial' !important;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 18px;
+  content: "\2750";
+  color: #333;
+  display:block;
+}
+input[type=checkbox]:checked:after {
+  content: "\2713";
+  color: #444;
+}
+
+
+input[type=radio] { 
+  cursor: pointer;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  outline: 0
+}
+input[type=radio]:after {
+  padding-right: 3px;
+  top: 1px;
+  font-family: 'Arial' !important;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 18px;
+  content: "O";
+  color: #333;
+  display:block;
+}
+input[type=radio]:checked:after {
+  content: "\2713";
+  color: 'black';
+}
+    </style>
     </head>
 
 
@@ -27,7 +84,7 @@
   <body >
     <div class="container">
     <div align= "left" style="font-size:47px"><strong>Sandesh</strong></div>
-    <p class="lead" align="left"style="font-size:14px;margin-top:-6px" >A Semantic Data Mesh Over Indian Open Data ( powered by Linked Open Data )</p>
+    <p class="lead" align="left" style="font-size:14px;margin-top:-6px" >A Semantic Data Mesh Over Indian Open Data ( powered by Linked Open Data )</p>
     </div>
     <hr style="margin-top:-7px; height:2px;border:none;color:#333;background-color:#333;">
     <div class="row">
@@ -35,12 +92,14 @@
     
     <div class="container" id="checkboxGroup" >
     <input type="checkbox" id="chkHeader" name="chkHeader" onclick="checkUncheckAll(this);">Collection<br/><br/>
-           <ul>
+           <ul >
            {% for item in filenames %}
-           <input type="checkbox" name="chkItems" onclick="checkUnCheckParent();" />{{ item }}<br/><br/>
+           <input type="checkbox" name="chkItems"  onclick="checkUnCheckParent();" style="border-radius: 10px" />{{ item }} &nbsp 
+           <button type="button" class="btn btn-default btn-xs">
+          <span class="glyphicon glyphicon-trash"></span>
+        </button><br/><br/>
            {% endfor %}
         </ul>
-    
     </div>
 
     <div class="container" id="radioGroup" style="display:none">
@@ -143,6 +202,26 @@
            });
 
 
+$.ajax({
+                  url : '/retrieve',
+                  data : inputValue,
+                  type : 'POST',
+                  success : function(data,textStatus,jQXHR){
+               var records1 = JSON.parse(data);
+               console.log(records1);
+                          console.log(typeof records1);
+   if(!(records1.isEmpty)){
+    document.getElementById('domain').value=records1[0][1];
+    document.getElementById('source').value=records1[0][2];
+    document.getElementById('description').value=records1[0][3];
+
+        }
+                  },
+                  error : function(jQXHR,textStatus,errorThrown){
+                    console.log("error : "+ textStatus);
+                  }
+           });
+
    });
 });
 </script>
@@ -161,7 +240,9 @@
             data: $('form').serialize(),
             type: 'POST',
             success: function(response) {
-                console.log(response);
+                  document.getElementById('checkboxGroup').style.display="none";
+                  document.getElementById('radioGroup').style.display = 'block';
+                
             },
             error: function(error) {
                 console.log(error);
@@ -185,6 +266,7 @@
   <div class="container">
     <ul class="nav navbar-nav">
       <button id="importFiles" class="btn btn-default navbar-btn btn-margin-left" >Import Files</button>
+      <span class="glyphicon glyphicon-arrow-right" style="color:white"></span>
       <script>
       $(document).ready(function(){
       $("#importFiles").click(function(){
@@ -197,13 +279,13 @@
       </script>
 
       <button id="View" class="btn btn-default navbar-btn btn-margin-left"">View</button>
-
+      <span class="glyphicon glyphicon-arrow-right" style="color:white"></span>
       <script>
       $(document).ready(function(){
       $("#View").click(function(){
 
         document.getElementById('IMPORTFILES').style.display = 'none';
-        document.getElementById('checkboxGroup').style.display="none"
+        document.getElementById('checkboxGroup').style.display="none";
         document.getElementById('radioGroup').style.display = 'block';
         document.getElementById('selectFromCollection').style.display='block';
          });
@@ -211,9 +293,20 @@
     </script>
 
       <button class="btn btn-default navbar-btn btn-margin-left">Semantic Footprint</button>
+      <span class="glyphicon glyphicon-arrow-right" style="color:white"></span>
       <button class="btn btn-default navbar-btn btn-margin-left">Run Model</button>
+      <span class="glyphicon glyphicon-arrow-right" style="color:white"></span>
       <button class="btn btn-default navbar-btn btn-margin-left">Upload N-Quad</button>
+      <span class="glyphicon glyphicon-arrow-right" style="color:white"></span>
       <button class="btn btn-default navbar-btn btn-margin-left">Query</button>
+      &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp 
+      <a href="javascript:void(0)" title="Steps to follow:
+1)Import Files:Select one or more files to upload.
+2)View:Select only one file at a time to enter metadata and view it's contents.
+3)Semantic Footprint: Select atleast two files to view how they are related to each other.
+4)Run Model
+5)Upload N-Quads 
+6)Query"><span class="glyphicon glyphicon-info-sign" style="font-size:20px;color:white"></span></a>
     </ul>
   </div>
 </nav>
