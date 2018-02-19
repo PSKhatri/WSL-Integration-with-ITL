@@ -9,25 +9,15 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-    <link href="../static/hello.css" rel="stylesheet">
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/mootools/1.6.0/mootools-core.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-
-    <style>
-
-.navbar-nav > button{
-  padding-left:30px;
-  padding-right:30px;
-}
+      <style>
+      .vl {
+            border-left: 2px lavender;
+            height: 730px;
+          }
 
 
-    input[type=checkbox] { 
+          input[type=checkbox] { 
   cursor: pointer;
   -webkit-appearance: none;
   -moz-appearance: none;
@@ -74,175 +64,160 @@ input[type=radio]:checked:after {
   color: 'black';
 }
     </style>
-    </head>
+      </style>
+
+<style>
+    a.disabled { color:lavender; 
+    pointer-events: none;
+    }
+  </style>
+
+
+
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link href="../static/hello.css" rel="stylesheet">
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mootools/1.6.0/mootools-core.min.js"></script>
+        
 
 
 
 
     <title>Sandesh 2.0</title>
   </head>
-  <body >
-    <div class="container">
-    <div align= "left" style="font-size:47px"><strong>Sandesh</strong></div>
-    <p class="lead" align="left" style="font-size:14px;margin-top:-6px" >A Semantic Data Mesh Over Indian Open Data ( powered by Linked Open Data )</p>
-    </div>
-    <hr style="margin-top:-7px; height:2px;border:none;color:#333;background-color:#333;">
-    <div class="row">
-    <div class="col-sm-3">
-    
-    <div class="container" id="checkboxGroup" >
-    <input type="checkbox" id="chkHeader" name="chkHeader" onclick="checkUncheckAll(this);">Collection<br/><br/>
-           <ul >
-           {% for item in filenames %}
-           <input type="checkbox" name="chkItems"  onclick="checkUnCheckParent();" style="border-radius: 10px" />{{ item }} &nbsp 
-           <button type="button" class="btn btn-default btn-xs">
-          <span class="glyphicon glyphicon-trash"></span>
-        </button><br/><br/>
-           {% endfor %}
-        </ul>
-    </div>
 
-    <div class="container" id="radioGroup" style="display:none">
-    <h5>Collection</h5>
-           <ul>
-           {% for item in filenames %}
-           <input type="radio" name="chkradio" value="{{ item }}"/>{{ item }}<br/><br/>
-           {% endfor %}
-           </ul>
-           </div>
-           
-
- 
-    <script type="text/javascript">
+<script type="text/javascript">
         function checkUncheckAll(sender) {
-            var chkElements = document.getElementsByName('chkItems');
+            var chkElements = document.getElementsByName('chkbx');
             for (var i = 0; i < chkElements.length; i++) {
                 chkElements[i].checked = sender.checked;
             }
         }
         function checkUnCheckParent() {
             var chkHeader = document.getElementById('chkHeader');
-            var chkElements = document.getElementsByName('chkItems');
+            var chkElements = document.getElementsByName('chkbx');
             var checkedCount = 0;
             for (var i = 0; i < chkElements.length; i++) {
                 if (chkElements[i].checked) {
                     checkedCount += 1;
                 }
             }
-            chkHeader.checked = (checkedCount === chkElements.length);
+            chkHeader.checked = (checkedCount === chkElements.length);  
         }
     </script>
-  
-    </div>
 
-    <script type="text/javascript">
+
+
+<script type="text/javascript">
            $(document).ready(function(){
-           $('input[type="radio"]').click(function(){
-           var inputValue = $(this).attr("value");
-           document.getElementById('name').innerHTML=inputValue;
-           document.getElementById('selectFromCollection').style.display='none';
-           document.getElementById('VIEW').style.display = 'block';
-           document.getElementById('table_csv').style.display='block';
+           $(document).on("click","input[type='radio']" ,function()
+            {
+              var inputValue = $(this).attr("value");
+              document.getElementById('selectFromCollection').innerHTML='';
+              document.getElementById('name').innerHTML=inputValue;
+              document.getElementById('selectFromCollection').style.display='none';
+              document.getElementById('VIEW').style.display = 'block';
+              document.getElementById('table_csv').style.display='block';
+                  $.ajax
+                  ({
+                        url : '/readcsv',
+                        data : 'inputFiles/'+inputValue,
+                        type : 'POST',
+                        success : function(data,textStatus,jQXHR)
+                        {
+                              document.getElementById("table_csv").innerHTML="";
+                              var records = JSON.parse(data);
+                              console.log(records);
+                              console.log(typeof records);
+                              var table = document.createElement('table');
+                              table.className="table table-striped table-bordered";
+                              table.setAttribute("id", "themedata");
+                              table.setAttribute("cellspacing", "0");
+                              table.setAttribute("width", "100%");
+                              var thead= document.createElement('thead');
+                              var tr = document.createElement('tr');
+                              tr.setAttribute("id","header_id");
+                              tr.setAttribute("font-size","2");
+                              for(var i=0;i<records[0].length;i++) 
+                              {
+                                  var th1 = document.createElement('th');
+                                  th1.setAttribute("id",records[0][i]);
+                                  th1.setAttribute("class","headers");
+                                  var textvalue = document.createTextNode(records[0][i]);
+                                  th1.appendChild(textvalue);
+                                  tr.appendChild(th1);
+                              }
+
+                              thead.appendChild(tr);
+                              table.appendChild(thead);
+                              var tbody= document.createElement('tbody');
+                              for(key in records) 
+                              {
+                                  if(key != "0") 
+                                  {
+                                      var tr2=document.createElement('tr');
+                                      for(var j=0;j<records[key].length;j++) 
+                                      {
+                                          var td=document.createElement('td');
+                                          var textvalue = document.createTextNode(records[key][j]);
+                                          td.appendChild(textvalue);
+                                          tr2.appendChild(td);
+                                      }
+                                      tbody.appendChild(tr2);
+                                  }
+                              }
+                              table.appendChild(tbody);
+                              document.getElementById("table_csv").appendChild(table);
+                        },
+                        error : function(jQXHR,textStatus,errorThrown)
+                        {
+                            console.log("error : "+ textStatus);
+                        }
+                  });
                   $.ajax({
-                  url : '/readcsv',
-                  data : 'inputFiles/'+inputValue,
-                  type : 'POST',
-                  success : function(data,textStatus,jQXHR){
-               document.getElementById("table_csv").innerHTML="";
-               var records = JSON.parse(data);
-               console.log(records);
-                          console.log(typeof records);
-   if(!(records.isEmpty)){
-        var table = document.createElement('table');
-        table.className="table table-striped table-bordered";
-        table.setAttribute("id", "themedata");
-        table.setAttribute("cellspacing", "0");
-        table.setAttribute("width", "100%");
-
-        var thead= document.createElement('thead');
-
-        var tr = document.createElement('tr');
-        tr.setAttribute("id","header_id");
-        tr.setAttribute("font-size","2");
-
-        for(var i=0;i<records[0].length;i++) {
-      var th1 = document.createElement('th');
-      th1.setAttribute("id",records[0][i]);
-      th1.setAttribute("class","headers");
-
-      var textvalue = document.createTextNode(records[0][i]);
-
-
-      th1.appendChild(textvalue);
-      tr.appendChild(th1);
-        }
-        thead.appendChild(tr);
-    table.appendChild(thead);
-
-        var tbody= document.createElement('tbody');
-        for(key in records) {
-          if(key != "0") {
-            var tr2=document.createElement('tr');
-            for(var j=0;j<records[key].length;j++) 
-      {
-              var td=document.createElement('td');
-              var textvalue = document.createTextNode(records[key][j]);
-              td.appendChild(textvalue);
-              tr2.appendChild(td);
-            }
-            tbody.appendChild(tr2);
-          }
-        }
-        table.appendChild(tbody);
-  document.getElementById("table_csv").appendChild(table);}
-                  },
-                  error : function(jQXHR,textStatus,errorThrown){
-                    console.log("error : "+ textStatus);
-                  }
-           });
-
-
-$.ajax({
                   url : '/retrieve',
                   data : inputValue,
                   type : 'POST',
                   success : function(data,textStatus,jQXHR){
                var records1 = JSON.parse(data);
-               console.log(records1);
-                          console.log(typeof records1);
-   if(!(records1.isEmpty)){
-    document.getElementById('domain').value=records1[0][1];
-    document.getElementById('source').value=records1[0][2];
-    document.getElementById('description').value=records1[0][3];
+                          document.getElementById('domain').value=records1[0][1];
+                          document.getElementById('source').value=records1[0][2];
+                          document.getElementById('description').value=records1[0][3];
 
-        }
+
                   },
                   error : function(jQXHR,textStatus,errorThrown){
                     console.log("error : "+ textStatus);
                   }
            });
 
-   });
-});
+              });
+          });
 </script>
 
 
-
-
-    <script type="text/javascript">
+<script type="text/javascript">
            $(document).ready(function(){
-           $('#savethecsv').click(function(){
+           $('#savethecsv').click(function(e){
+            e.preventDefault();
            document.getElementById('selectFromCollection').style.display='none';
-           document.getElementById('VIEW').style.display = 'none';
+           document.getElementById('VIEW').style.display = 'block';
            document.getElementById('table_csv').style.display='block';
-                  $.ajax({
+                 $.ajax({
             url: '/save',
             data: $('form').serialize(),
             type: 'POST',
             success: function(response) {
-                  document.getElementById('checkboxGroup').style.display="none";
-                  document.getElementById('radioGroup').style.display = 'block';
-                
+                console.log(response);
             },
             error: function(error) {
                 console.log(error);
@@ -253,88 +228,166 @@ $.ajax({
 </script>
 
 
+<script>
+function importFiles(){
 
-
-
-
-
-
-
-
-    <div class="col-sm-9">
-     <nav class="navbar navbar-inverse">
-  <div class="container">
-    <ul class="nav navbar-nav">
-      <button id="importFiles" class="btn btn-default navbar-btn btn-margin-left" >Import Files</button>
-      <span class="glyphicon glyphicon-arrow-right" style="color:white"></span>
-      <script>
-      $(document).ready(function(){
-      $("#importFiles").click(function(){
+        
         document.getElementById('IMPORTFILES').style.display = 'block';
         document.getElementById('VIEW').style.display = 'none';
+        document.getElementById('checkboxGroup').style.display="block"
         document.getElementById('selectFromCollection').style.display='none';
         document.getElementById('radioGroup').style.display = 'none';
-        });
-      });
-      </script>
+        }
+</script>
 
-      <button id="View" class="btn btn-default navbar-btn btn-margin-left"">View</button>
-      <span class="glyphicon glyphicon-arrow-right" style="color:white"></span>
-      <script>
-      $(document).ready(function(){
-      $("#View").click(function(){
+
+<script>
+function viewfunc(){
 
         document.getElementById('IMPORTFILES').style.display = 'none';
-        document.getElementById('checkboxGroup').style.display="none";
+        document.getElementById('checkboxGroup').style.display="none"
         document.getElementById('radioGroup').style.display = 'block';
         document.getElementById('selectFromCollection').style.display='block';
-         });
-      });
-    </script>
+        }
+</script>
 
-      <button class="btn btn-default navbar-btn btn-margin-left">Semantic Footprint</button>
-      <span class="glyphicon glyphicon-arrow-right" style="color:white"></span>
-      <button class="btn btn-default navbar-btn btn-margin-left">Run Model</button>
-      <span class="glyphicon glyphicon-arrow-right" style="color:white"></span>
-      <button class="btn btn-default navbar-btn btn-margin-left">Upload N-Quad</button>
-      <span class="glyphicon glyphicon-arrow-right" style="color:white"></span>
-      <button class="btn btn-default navbar-btn btn-margin-left">Query</button>
-      &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp &nbsp 
-      <a href="javascript:void(0)" title="Steps to follow:
+
+<script>
+  $(document).ready(function(){
+  $("#uploadFileBtn").click(function(event){
+      event.preventDefault();
+      $("#View").removeClass("disabled");
+      document.getElementById('checkboxGroup').style.display = 'block';
+    //  document.getElementById('radioGroup').style.display = 'block';
+      
+      var formData = new FormData($("#formforip")[0]);
+
+   $.ajax({
+       url: '/uploaded',
+       type: 'POST',
+       data: formData,
+       async: false,
+       cache: false,
+       contentType: false,
+       enctype: 'multipart/form-data',
+       processData: false,
+       success: function (response) {
+          var list=JSON.parse(response);
+          
+
+  var i;
+  for (i=0;i<list.length;i++){
+    var xc = document.createElement("LI");
+    var xr = document.createElement("LI");
+    var txtr = document.createTextNode(list[i]);
+    var txtc = document.createTextNode(list[i]);
+    var span = document.createElement("SPAN");
+    span.addClass("glyphicon glyphicon-trash");
+    var ir = document.createElement("input");
+    var ic = document.createElement("input");
+    ir.setAttribute("id",list[i]);
+    ic.setAttribute("id",list[i]);
+    ir.setAttribute("value",list[i]);
+    ir.setAttribute("type","radio");
+    ic.setAttribute("type","checkbox");
+    ir.setAttribute("name","chkrad");
+    ic.setAttribute("name","chkbx");
+
+    xr.appendChild(ir);
+    xr.appendChild(txtr);
+    xc.appendChild(ic);
+    xc.appendChild(txtc);
+    xc.appendChild(span);
+    document.getElementById('radioul').appendChild(xr);
+    document.getElementById('chcklist').appendChild(xc);
+    }
+
+
+       },
+       error: function(error) {
+                alert(error);
+      }
+      });
+  document.getElementById('formforip').reset(); 
+
+  });
+});
+</script>
+
+
+<script>
+$(document).ready(function(){
+    $('[data-toggle="tooltip"]').tooltip();   
+});
+</script>
+
+
+  <body >
+    <div class="container">
+    <div align= "left" style="font-size:47px"><strong>Sandesh</strong></div>
+    <p class="lead" align="left"style="font-size:14px;margin-top:-6px" >A Semantic Data Mesh Over Indian Open Data ( powered by Linked Open Data )</p>
+    </div>
+    <hr style="margin-top:-7px; height:2px;border:none;color:#333;background-color:#333;">
+
+    <div class="col-sm-3" style="background-color: lavender">
+    
+    <div class="container" id="checkboxGroup" style="display: none;">
+       <h4><input type="checkbox" id="chkHeader" name="chkHeader" onclick="checkUncheckAll(this);">Collection</h4>
+          <ul id = "chcklist" style="list-style: none;">
+          
+          </ul>
+    
+    </div>
+
+    <div class="container" id="radioGroup" style="display:none">
+    <h4>Collection</h4>
+           <ul id = "radioul" style="list-style: none;">
+         
+           </ul>
+    </div>
+
+    
+  <div class="vl"></div>
+    </div>
+
+
+<div class="col-sm-9">
+
+<nav class="navbar navbar-inverse">
+  <div class="container-fluid">
+
+    <ul class="nav navbar-nav">
+      <li><a href="javascript:void(0);" onclick="importFiles()" id="importFiles" >Import Files </a></li>
+      <li><span class="glyphicon glyphicon-arrow-right" style="top :15px ;color:white ; "></span></li>
+      <li><a href="javascript:void(0);" onclick="viewfunc()" id="View" class="disabled"">View</a></li>
+      <li><span class="glyphicon glyphicon-arrow-right" style="top :15px ;color:white ; "></span></li>
+      <li><a href="javascript:void(0);" class="disabled" >Semantic Footprint</a></li>
+      <li><span class="glyphicon glyphicon-arrow-right" style="top :15px ;color:white ; "></span></li>
+      <li><a href="javascript:void(0);" class="disabled">Run Model</a></li>
+      <li><span class="glyphicon glyphicon-arrow-right" style="top :15px ;color:white ; "></span></li>
+      <li><a href="javascript:void(0);" class="disabled">Upload N-Quad</a></li>
+      <li><span class="glyphicon glyphicon-arrow-right" style="top :15px ;color:white ; "></span></li>
+      <li><a href="javascript:void(0);" class="disabled">Query</a></li>
+      <li><a href="javascript:void(0);" title="Steps to follow:
 1)Import Files:Select one or more files to upload.
 2)View:Select only one file at a time to enter metadata and view it's contents.
 3)Semantic Footprint: Select atleast two files to view how they are related to each other.
 4)Run Model
 5)Upload N-Quads 
-6)Query"><span class="glyphicon glyphicon-info-sign" style="font-size:20px;color:white"></span></a>
+6)Query"><span class="glyphicon glyphicon-info-sign"></span></a></li>
     </ul>
   </div>
 </nav>
 
+
 <div id="IMPORTFILES" style="display: none">
-  <form  id ="formforip" action="/uploaded"  method = "POST" 
-         enctype = "multipart/form-data">
-         <input type = "file" name = "file[]" id="inputfiles" accept=".csv" multiple/>
-         <input type = "submit" id="uploadFileBtn" onclick="myFunction()"/>
+  <form  id ="formforip" action="/"  method = "POST" 
+         enctype = "multipart/form">
+         <input type = "file" name = "uploadedfiles[]" id="inputfiles" accept=".csv" multiple/>
+         <input type = "submit" id="uploadFileBtn" />
     </form>
-<script>
-$(document).ready(function(){
-  $("#formforip").submit(function(){
-    if(document.getElementById("inputfiles").files.length == 0 ){
-      alert("empty");
-      
-    }
-    else{
-      alert("uploaded!!");
-    }
-  });
-});
-</script>
 
-<script type="text/javascript">
-  
 
-</script>
 </div>
 
 <div id="selectFromCollection" style="display: none">
@@ -352,10 +405,11 @@ $(document).ready(function(){
       <div class='header_names' id='table_csv' style="display: none">table</div>
       <input type="submit" id="savethecsv" value="SAVE">
    </form>
-</div>
 
 
 </div>
+
+
 
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->

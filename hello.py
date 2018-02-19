@@ -5,7 +5,7 @@ from flask import Flask, request, redirect, url_for,render_template,jsonify,json
 from werkzeug import secure_filename
 from flask_jsglue import JSGlue
 import csv
-filenames=[]
+#filenames=[]
 UPLOAD_FOLDER = 'inputFiles'
 ALLOWED_EXTENSIONS = set(['csv'])
 app = Flask(__name__)
@@ -22,9 +22,11 @@ def hello():
 @app.route('/uploaded', methods=['GET','POST'])#this '/' will be the root ie it will display the home play of the website
 def uploaded():
     global filenames
-    #print (os.getcwd())
+    filenames=[]
+    print (os.getcwd())
     if request.method == 'POST':  
-      uploaded_files = request.files.getlist("file[]")
+      uploaded_files = request.files.getlist("uploadedfiles[]")
+      print(uploaded_files)
       for file in uploaded_files:
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
@@ -34,7 +36,8 @@ def uploaded():
       #return redirect(url_for('uploaded_file', filename=filename))
       filenames=set(filenames)
       filenames=list(filenames)
-      return render_template('hello1.html',filenames=filenames)    
+      print(filenames)
+      return json.dumps(filenames)
     else:
       return render_template('hello1.html' , filenames=filenames)
 @app.route('/readcsv', methods=['GET','POST'])
@@ -56,12 +59,20 @@ def readcsv():
 
 @app.route('/save', methods=['POST'])
 def save():
+    # read the posted values from the UI
+    print("save me aya re")
+    head=["Name","Domain","Source","Description"]
     name = request.form['name']
     print (name)
     domain = request.form['domain']
     #print (domain)
     source = request.form['source']
     description = request.form['description']
+    if(not os.path.exists('inputFiles/input_files.csv')):
+      f=open('inputFiles/input_files.csv','w')
+      writer= csv.writer(f)
+      writer.writerow(head)
+      f.close()
     
     line=[name,domain,source,description]
     print(line)
@@ -79,28 +90,27 @@ def save():
     	if(flag==0):
     		writer.writerow(line)
 
-	#f=open('inputFiles/input_files.csv')
-	#print(f.read())
+
+	
 	os.remove('inputFiles/input_files.csv')
 
 	os.rename('inputFiles/tmp_i.csv','inputFiles/input_files.csv')
-	return json.dumps(line)
 
 @app.route('/retrieve', methods=['POST'])
 def retrieve():
-	fname=request.get_data()
-	resultset1 = {}
-	flag=0
-	with open('inputFiles/input_files.csv', 'r+') as f:
-		reader = csv.reader(f)
-		for row in reader:
-			if row[0]==fname:
-				resultset1[0] = row
-				flag=1
-				break
-		if flag==0:
-			resultset1[0]=[fname,'','','']
-		 		
-	print resultset1
-	return json.dumps(resultset1)
-	
+  fname=request.get_data()
+  resultset1 = {}
+  flag=0
+  with open('inputFiles/input_files.csv', 'r+') as f:
+    reader = csv.reader(f)
+    for row in reader:
+      if row[0]==fname:
+        resultset1[0] = row
+        flag=1
+        break
+    if flag==0:
+      resultset1[0]=[fname,'','','']
+        
+  print resultset1
+  return json.dumps(resultset1)
+  
