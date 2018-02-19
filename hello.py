@@ -38,8 +38,7 @@ def uploaded():
       filenames=list(filenames)
       print(filenames)
       return json.dumps(filenames)
-    else:
-      return render_template('hello1.html' , filenames=filenames)
+    
 @app.route('/readcsv', methods=['GET','POST'])
 def readcsv():
       if request.method == 'POST':
@@ -113,4 +112,14 @@ def retrieve():
         
   print resultset1
   return json.dumps(resultset1)
+  
+
+@app.route('/delete', methods=['POST'])
+def delete():
+  dfname=request.get_data()
+  print(dfname)
+  filenames.remove(dfname)
+  print(filenames)
+  os.remove('inputFiles/'+dfname)
+  return json.dumps(filenames)
   

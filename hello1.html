@@ -17,7 +17,7 @@
           }
 
 
-          input[type=checkbox] { 
+  input[type=checkbox] { 
   cursor: pointer;
   -webkit-appearance: none;
   -moz-appearance: none;
@@ -63,8 +63,8 @@ input[type=radio]:checked:after {
   content: "\2713";
   color: 'black';
 }
-    </style>
-      </style>
+ 
+      </style>  
 
 <style>
     a.disabled { color:lavender; 
@@ -210,7 +210,9 @@ input[type=radio]:checked:after {
            $('#savethecsv').click(function(e){
             e.preventDefault();
            document.getElementById('selectFromCollection').style.display='none';
-           document.getElementById('VIEW').style.display = 'block';
+           document.getElementById('VIEW').style.display = 'none';
+           $("input:radio").removeAttr("checked");
+
            document.getElementById('table_csv').style.display='block';
                  $.ajax({
             url: '/save',
@@ -227,14 +229,83 @@ input[type=radio]:checked:after {
 });
 </script>
 
+<script type="text/javascript">
+          $(document).on("click","a[name='adelete']" ,function(){
+            var dfname=$(this).attr("id");
+            //alert(dfname);
+            document.getElementById('radioul').innerHTML='';
+            document.getElementById('listul').innerHTML='';
+            document.getElementById('chcklist').innerHTML='';
+            $.ajax({
+                  url : '/delete',
+                  data : dfname,
+                  type : 'POST',
+
+                    success: function (response) {
+          var list=JSON.parse(response);
+
+          
+
+  var i;
+  for (i=0;i<list.length;i++){
+    
+    var br=document.createElement("br");
+    var xc = document.createElement("LI");
+    var xr = document.createElement("LI");
+    var xl = document.createElement("LI");
+    var txtr = document.createTextNode(list[i]);
+    var a=document.createElement('a');
+    var txtc = document.createTextNode(list[i]);
+    var txtl = document.createTextNode(list[i]);
+    var span = document.createElement("SPAN");
+    
+    var ir = document.createElement("input");
+    var ic = document.createElement("input");
+
+    span.addClass("glyphicon glyphicon-trash");
+    a.setAttribute('href',"javascript:void(0);");
+    a.setAttribute('id',list[i]);
+    a.setAttribute('name',"adelete");
+    ir.setAttribute("id",list[i]);
+    ic.setAttribute("id",list[i]);
+    ir.setAttribute("value",list[i]);
+    ir.setAttribute("type","radio");
+    ic.setAttribute("type","checkbox");
+    ir.setAttribute("name","chkrad");
+    ic.setAttribute("name","chkbx");
+    xr.appendChild(ir);
+    xr.appendChild(txtr);
+    xc.appendChild(ic);
+    xc.appendChild(txtc);
+    a.appendChild(span);
+    xl.appendChild(txtl);
+    xl.appendChild(a);
+    document.getElementById('listul').appendChild(xl);
+    document.getElementById('listul').appendChild(br);
+    document.getElementById('radioul').appendChild(xr);
+    document.getElementById('chcklist').appendChild(xc);
+    }
+
+
+       },
+       error: function(error) {
+                alert(error);
+      }
+
+          });
+
+});
+</script>
 
 <script>
 function importFiles(){
 
-        
+        document.getElementById('liimp').addClass("active");
+        document.getElementById('liview').removeClass("active");
         document.getElementById('IMPORTFILES').style.display = 'block';
         document.getElementById('VIEW').style.display = 'none';
-        document.getElementById('checkboxGroup').style.display="block"
+        document.getElementById('listGroup').style.display="block";
+        document.getElementById('checkboxGroup').style.display="none";
         document.getElementById('selectFromCollection').style.display='none';
         document.getElementById('radioGroup').style.display = 'none';
         }
@@ -243,12 +314,33 @@ function importFiles(){
 
 <script>
 function viewfunc(){
-
+        $("input:radio").removeAttr("checked");
+        document.getElementById('liview').addClass("active");
+        document.getElementById('liimp').removeClass("active");
         document.getElementById('IMPORTFILES').style.display = 'none';
-        document.getElementById('checkboxGroup').style.display="none"
+        document.getElementById('checkboxGroup').style.display="none";
+        document.getElementById('listGroup').style.display="none"
         document.getElementById('radioGroup').style.display = 'block';
         document.getElementById('selectFromCollection').style.display='block';
+        $("#semfp").removeClass("disabled");
         }
+</script>
+
+
+<script type="text/javascript">
+  function semfp(){
+        document.getElementById('lisfp').addClass("active");
+        document.getElementById('liview').removeClass("active");
+        document.getElementById('liimp').removeClass("active");
+        document.getElementById('IMPORTFILES').style.display = 'none';
+        document.getElementById('VIEW').style.display = 'none';
+        document.getElementById('listGroup').style.display="none";
+        document.getElementById('checkboxGroup').style.display="block";
+        document.getElementById('selectFromCollection').style.display='none';
+        document.getElementById('radioGroup').style.display = 'none';
+
+  }
+
 </script>
 
 
@@ -257,8 +349,7 @@ function viewfunc(){
   $("#uploadFileBtn").click(function(event){
       event.preventDefault();
       $("#View").removeClass("disabled");
-      document.getElementById('checkboxGroup').style.display = 'block';
-    //  document.getElementById('radioGroup').style.display = 'block';
+      
       
       var formData = new FormData($("#formforip")[0]);
 
@@ -277,14 +368,24 @@ function viewfunc(){
 
   var i;
   for (i=0;i<list.length;i++){
+    
+    var br=document.createElement("br");
     var xc = document.createElement("LI");
     var xr = document.createElement("LI");
+    var xl = document.createElement("LI");
     var txtr = document.createTextNode(list[i]);
+    var a=document.createElement('a');
     var txtc = document.createTextNode(list[i]);
+    var txtl = document.createTextNode(list[i]);
     var span = document.createElement("SPAN");
-    span.addClass("glyphicon glyphicon-trash");
+    
     var ir = document.createElement("input");
     var ic = document.createElement("input");
+
+    span.addClass("glyphicon glyphicon-trash");
+    a.setAttribute('href',"javascript:void(0);");
+    a.setAttribute('id',list[i]);
+    a.setAttribute('name',"adelete");
     ir.setAttribute("id",list[i]);
     ic.setAttribute("id",list[i]);
     ir.setAttribute("value",list[i]);
@@ -292,12 +393,15 @@ function viewfunc(){
     ic.setAttribute("type","checkbox");
     ir.setAttribute("name","chkrad");
     ic.setAttribute("name","chkbx");
-
     xr.appendChild(ir);
     xr.appendChild(txtr);
     xc.appendChild(ic);
     xc.appendChild(txtc);
-    xc.appendChild(span);
+    a.appendChild(span);
+    xl.appendChild(txtl);
+    xl.appendChild(a);
+    document.getElementById('listul').appendChild(xl);
+    document.getElementById('listul').appendChild(br);
     document.getElementById('radioul').appendChild(xr);
     document.getElementById('chcklist').appendChild(xc);
     }
@@ -330,7 +434,13 @@ $(document).ready(function(){
     <hr style="margin-top:-7px; height:2px;border:none;color:#333;background-color:#333;">
 
     <div class="col-sm-3" style="background-color: lavender">
-    
+
+      <div class="container" id="listGroup" style="display: none;">
+       <h4>Collection</h4>
+          <ul id = "listul" >
+          
+          </ul>
+</div>
     <div class="container" id="checkboxGroup" style="display: none;">
        <h4><input type="checkbox" id="chkHeader" name="chkHeader" onclick="checkUncheckAll(this);">Collection</h4>
           <ul id = "chcklist" style="list-style: none;">
@@ -357,11 +467,11 @@ $(document).ready(function(){
   <div class="container-fluid">
 
     <ul class="nav navbar-nav">
-      <li><a href="javascript:void(0);" onclick="importFiles()" id="importFiles" >Import Files </a></li>
+      <li id='liimp'><a href="javascript:void(0);" onclick="importFiles()" id="importFiles" >Import Files </a></li>
       <li><span class="glyphicon glyphicon-arrow-right" style="top :15px ;color:white ; "></span></li>
-      <li><a href="javascript:void(0);" onclick="viewfunc()" id="View" class="disabled"">View</a></li>
+      <li id='liview'><a href="javascript:void(0);" onclick="viewfunc()" id="View" class="disabled"">View</a></li>
       <li><span class="glyphicon glyphicon-arrow-right" style="top :15px ;color:white ; "></span></li>
-      <li><a href="javascript:void(0);" class="disabled" >Semantic Footprint</a></li>
+      <li id='lisfp'><a href="javascript:void(0);" class="disabled" id="semfp" onclick="semfp()">Semantic Footprint</a></li>
       <li><span class="glyphicon glyphicon-arrow-right" style="top :15px ;color:white ; "></span></li>
       <li><a href="javascript:void(0);" class="disabled">Run Model</a></li>
       <li><span class="glyphicon glyphicon-arrow-right" style="top :15px ;color:white ; "></span></li>
